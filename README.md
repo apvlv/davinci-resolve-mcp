@@ -20,7 +20,7 @@ Model Context Protocol (MCP) server that lets MCP clients control and inspect Da
 ## Install
 
 ```bash
-git clone https://github.com/schoi80/davinci-resolve-mcp.git
+git clone https://github.com/apvlv/davinci-resolve-mcp.git
 cd davinci-resolve-mcp
 uv sync --all-extras --dev
 ```
