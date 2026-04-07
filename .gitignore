@@ -24,6 +24,7 @@ wheels/
 venv/
 env/
 ENV/
+.venv/
 
 # IDE specific files
 .idea/
@@ -37,3 +38,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Test artifacts
+.coverage
+htmlcov/

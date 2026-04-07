@@ -1,137 +1,116 @@
-| :warning: WARNING           |
-|:----------------------------|
-| This project was done with the help of AI coding agents.     |
-
-
 # DaVinci Resolve MCP Server
 
-A Model Context Protocol (MCP) server for interacting with DaVinci Resolve and Fusion. This server allows AI assistants like Claude to directly interact with and control DaVinci Resolve through the Model Context Protocol.
+Model Context Protocol (MCP) server that lets MCP clients control and inspect DaVinci Resolve (including Fusion) through tools and resources.
 
-## Features
+## What it provides
 
-- Two-way communication: Connect Claude AI to DaVinci Resolve through the MCP protocol
-- Project management: Create, open, and manage DaVinci Resolve projects
-- Timeline manipulation: Create, modify, and navigate timelines
-- Media management: Import, organize, and manage media in the Media Pool
-- Fusion integration: Create and modify Fusion compositions
-- Scene inspection: Get detailed information about the current DaVinci Resolve project
-- Code execution: Run arbitrary Python code in DaVinci Resolve from Claude
+- Project management (create, load, save)
+- Timeline operations (create timeline, switch timeline, build from clips)
+- Media pool operations (import media, create folders, inspect folders)
+- Fusion helpers (add comp to clip, create nodes, create node chains)
+- Resolve page navigation
+- Advanced scripting (`execute_python`, `execute_lua`)
 
-## Installation
+## Requirements
 
-### Prerequisites
+- Python 3.10+
+- DaVinci Resolve with scripting API available
+- An MCP-compatible client (for example Claude Desktop)
 
-- DaVinci Resolve Studio (version 17 or higher recommended)
-- Python 3.8 or higher
-- Claude Desktop (for AI integration)
+## Install
 
-### Setup
+```bash
+git clone https://github.com/schoi80/davinci-resolve-mcp.git
+cd davinci-resolve-mcp
+uv sync --all-extras --dev
+```
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/apvlv/davinci-resolve-mcp.git
-   cd davinci-resolve-mcp
-   ```
+## Run the server
 
-2. Install the required dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+```bash
+uv run davinci-resolve-mcp
+```
 
-3. Install the MCP server in Claude Desktop:
-   ```
-   mcp install src/resolve_mcp/server.py
-   ```
+The server will try to connect to Resolve on startup. Make sure DaVinci Resolve is running.
 
-   Alternatively, you can install with the editable flag for development:
-   ```
-   mcp install src/resolve_mcp/server.py --with-editable .
-   ```
+## MCP client setup
 
-## Usage
+Configure your MCP client to launch the server command:
 
-### With Claude Desktop
+```json
+{
+  "mcpServers": {
+    "davinci-resolve": {
+      "command": "uv",
+      "args": ["run", "davinci-resolve-mcp"]
+    }
+  }
+}
+```
 
-1. Start DaVinci Resolve
-2. In Claude Desktop, connect to the "DaVinci Resolve MCP" server
-3. You can now interact with DaVinci Resolve through Claude
+## Resources
 
-### With 5ire
+- `system://status`
+- `project://current`
+- `project://timelines`
+- `timeline://current`
+- `mediapool://folders`
+- `mediapool://current`
+- `storage://volumes`
 
-[5ire](https://5ire.app/) is an open-source cross-platform desktop AI assistant and MCP client that's compatible with this server.
+## Tools
 
-1. Install 5ire from [GitHub](https://github.com/nanbingxyz/5ire) or using Homebrew on macOS:
-   ```
-   brew tap brewforge/extras
-   brew install --cask 5ire
-   ```
-2. Start DaVinci Resolve
-3. In 5ire, add the DaVinci Resolve MCP server
-4. Connect to the server using your preferred AI model (OpenAI, Claude, etc.)
-5. You can now interact with DaVinci Resolve through 5ire
+### Project
 
-## Available Commands
+- `create_project(name)`
+- `load_project(name)`
+- `save_project()`
 
-### Resources (Information Retrieval)
+### Timeline
 
-- `project://current` - Get information about the current project
-- `project://timelines` - Get a list of timelines in the current project
-- `timeline://current` - Get information about the current timeline
-- `mediapool://folders` - Get a list of folders in the media pool
-- `mediapool://current` - Get information about the current media pool folder
-- `storage://volumes` - Get a list of mounted volumes in the media storage
-- `system://status` - Get the current status of the DaVinci Resolve connection
+- `create_timeline(name)`
+- `set_current_timeline(index)`
 
-### Project Management
+### Media
 
-- `create_project(name)` - Create a new DaVinci Resolve project
-- `load_project(name)` - Load an existing DaVinci Resolve project
-- `save_project()` - Save the current DaVinci Resolve project
+- `import_media(file_paths)`
+- `create_folder(name)`
+- `create_timeline_from_clips(name, clip_indices)`
 
-### Timeline Management
+### Fusion
 
-- `create_timeline(name)` - Create a new timeline in the current project
-- `set_current_timeline(index)` - Set the current timeline by index (1-based)
+- `add_fusion_comp_to_clip(timeline_index, track_type, track_index, item_index)`
+- `create_fusion_node(node_type, parameters)`
+- `create_fusion_node_chain(node_chain)`
 
-### Media Management
+### Resolve UI
 
-- `import_media(file_paths)` - Import media files into the current media pool folder
-- `create_folder(name)` - Create a new folder in the current media pool folder
-- `create_timeline_from_clips(name, clip_indices)` - Create a new timeline from clips in the current media pool folder
+- `open_page(page_name)` where page name is one of:
+  - `media`, `edit`, `fusion`, `color`, `fairlight`, `deliver`
 
-### Fusion Integration
+### Advanced
 
-- `add_fusion_comp_to_clip(timeline_index, track_type, track_index, item_index)` - Add a Fusion composition to a clip in the timeline
-- `create_fusion_node(node_type, parameters)` - Create a specific Fusion node in the current composition
-- `create_fusion_node_chain(node_chain)` - Create a chain of connected Fusion nodes in the current composition
+- `execute_python(code)`
+- `execute_lua(script)`
 
-### Page Navigation
+## Development
 
-- `open_page(page_name)` - Open a specific page in DaVinci Resolve (media, edit, fusion, color, fairlight, deliver)
+```bash
+make install      # install deps and pre-commit hooks
+make lint-check   # ruff check
+make format-check # ruff format check
+make test         # pytest with coverage
+make check        # lint + format + tests
+```
 
-### Advanced Operations
+## Example usage ideas
 
-- `execute_python(code)` - Execute arbitrary Python code in DaVinci Resolve
-- `execute_lua(script)` - Execute a Lua script in DaVinci Resolve's Fusion
-
-## Examples
-
-- "Create a new project named 'My Documentary'"
-- "Import all video files from the Downloads folder"
-- "Create a new timeline with the selected clips"
-- "Apply a Fusion effect to the selected clip"
-- "Get information about the current project"
-- "Switch to the Color page"
-- "Save the current project"
-- "Create a folder named 'Raw Footage' in the media pool"
-- "Create a Blur node in the current Fusion composition"
-- "Create a Text node with the content 'Hello World'"
-- "Create a chain of nodes: MediaIn -> Blur -> ColorCorrector -> MediaOut"
-
-## Technical Details
-
-The server uses the Model Context Protocol to communicate between Claude and DaVinci Resolve. It leverages DaVinci Resolve's Python API to control the application.
+- "Create a project named `My Documentary`"
+- "List timelines in the current project"
+- "Import these files into the media pool"
+- "Open the Color page"
+- "Create a Fusion node chain Blur -> ColorCorrector"
 
 ## License
 
-MIT
+MIT (see `LICENSE`)

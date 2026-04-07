@@ -1,0 +1,63 @@
+[project]
+name = "davinci-resolve-mcp"
+version = "0.1.0"
+description = "Model Context Protocol (MCP) server for DaVinci Resolve"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Sage Choi", email = "sage.choi@gmail.com" }
+]
+dependencies = [
+  "mcp>=0.3.0",
+  "pydantic>=2.0.0",
+  "typing-extensions>=4.0.0",
+]
+
+[project.scripts]
+davinci-resolve-mcp = "davinci_resolve_mcp.server:main"
+
+[project.optional-dependencies]
+dev = [
+  "pre-commit>=4.0.0",
+  "pytest>=8.0.0",
+  "pytest-cov>=5.0.0",
+  "ruff>=0.9.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.21,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[dependency-groups]
+dev = [
+  "pre-commit>=4.0.0",
+  "pytest>=8.0.0",
+  "pytest-cov>=5.0.0",
+  "ruff>=0.9.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+major_on_zero = false
+branch = "main"
+upload_to_pypi = false
+upload_to_release = true
